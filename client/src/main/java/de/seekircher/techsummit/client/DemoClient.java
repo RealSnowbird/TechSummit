@@ -30,12 +30,12 @@ public class DemoClient {
         client = javax.ws.rs.client.ClientBuilder.newClient();
         webTarget = client.target(BASE_URI).path("demo");
     }
-
-    public String echo(String name) throws ClientErrorException {
-        return echo(0L, name);
-    }
     
-    public String echo(Long delaySeconds, String name) throws ClientErrorException {
+    public String echo(String name) throws ClientErrorException {
+        return echo(name, null, null);
+    }
+
+    public String echo(String name, Integer delaySeconds, Boolean useHystrix) throws ClientErrorException {
         WebTarget resource = webTarget;
         if (delaySeconds != null) {
             resource = resource.queryParam("delaySeconds", delaySeconds);
@@ -43,11 +43,15 @@ public class DemoClient {
         if (name != null) {
             resource = resource.queryParam("name", name);
         }
+        if (useHystrix != null) {
+            resource = resource.queryParam("useHystrix", useHystrix);
+        }
+        
+        
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(String.class);
     }
 
     public void close() {
         client.close();
     }
-    
 }
